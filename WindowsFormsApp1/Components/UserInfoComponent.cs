@@ -68,7 +68,7 @@ namespace WindowsFormsApp1.Components
 
         private void InitComponents(UserInfo userInfo, int width)
         {
-            var dateOfBirth = userInfo == null
+            var dateOfBirth = userInfo == null || userInfo.DobYear < 1700
                     ? DateTime.Today : new DateTime(userInfo.DobYear, userInfo.DobMonth, userInfo.DobDay);
 
             _userId = userInfo?.Id;
