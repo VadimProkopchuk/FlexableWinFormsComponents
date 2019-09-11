@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Drawing;
 using System.IO;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
 
 namespace WindowsFormsApp1.Configs
 {
     class GeneralConfiguration
     {
-        private const string FilePath = "users.bin";
+        private const string FilePath = "users.txt";
         public static string UsersDataFilePath => Path.Combine(AppDomain.CurrentDomain.BaseDirectory, FilePath);
-        public static IFormatter FileFormatter => new BinaryFormatter();
+        public static char RowSeparator => '\\';
+        public static char PropertySeparator => '/';
 
         public const int ButtonHeight = 25;
         public const int ButtonMarginRight = 5;

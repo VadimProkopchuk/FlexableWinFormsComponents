@@ -16,8 +16,8 @@ namespace WindowsFormsApp1
 
         public Form1()
         {
-            _userInfoWriteService = new UserInfoWriteService(GeneralConfiguration.FileFormatter);
-            _userInfoReadService = new UserInfoReadService(GeneralConfiguration.FileFormatter);
+            _userInfoWriteService = new UserInfoWriteService();
+            _userInfoReadService = new UserInfoReadService();
 
             InitializeComponent();
         }

@@ -2,9 +2,14 @@
 
 namespace WindowsFormsApp1.Models
 {
-    [Serializable]
     public class UserInfo
     {
+        public UserInfo(Guid? userId = null)
+        {
+            Id = userId ?? Guid.NewGuid();
+        }
+
+        public Guid Id { get; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string MiddleName { get; set; }

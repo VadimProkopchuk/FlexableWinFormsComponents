@@ -55,9 +55,9 @@ namespace WindowsFormsApp1.Components
             _dateTimePicker = new DateTimePicker()
             {
                 Size = GeneralConfiguration.TextBoxSize,
-                Text = data.ToShortDateString(),
                 BackColor = Color.Azure,
-                MaxDate = DateTime.Today
+                MaxDate = DateTime.Today,
+                Value = data
             };
         }
     }

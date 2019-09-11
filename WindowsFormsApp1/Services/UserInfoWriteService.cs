@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.Serialization;
+using System.Text;
 using WindowsFormsApp1.Configs;
 using WindowsFormsApp1.Models;
 
@@ -10,22 +10,39 @@ namespace WindowsFormsApp1.Services
 {
     class UserInfoWriteService
     {
-        private readonly IFormatter _formatter;
-
-        public UserInfoWriteService(IFormatter formatter)
-        {
-            _formatter = formatter;
-        }
-
         public void WriteUsersInfo(List<UserInfo> usersInfo)
         {
             if (usersInfo == null) { throw new ArgumentNullException(nameof(usersInfo));}
 
-            using (var outputStream = new FileStream(GeneralConfiguration.UsersDataFilePath, 
-                FileMode.OpenOrCreate, FileAccess.Write))
+            try
             {
-                _formatter.Serialize(outputStream, usersInfo.ToList());
+                var content = String.Join(GeneralConfiguration.RowSeparator.ToString(), usersInfo.Select(ToSaveFormat));
+
+                File.WriteAllText(GeneralConfiguration.UsersDataFilePath, content, Encoding.UTF8);
+            }
+            catch (Exception e)
+            {
+                // TODO: log
             }
         }
+
+        private string ToSaveFormat(UserInfo userInfo)
+        {
+            return String.Join(GeneralConfiguration.PropertySeparator.ToString(), new[]
+            {
+                userInfo.Email,
+                userInfo.FacultyName,
+                userInfo.FirstName,
+                userInfo.GroupNumber,
+                userInfo.LastName,
+                userInfo.MiddleName,
+                userInfo.Phone,
+                userInfo.DobDay.ToString(),
+                userInfo.DobMonth.ToString(),
+                userInfo.DobYear.ToString(),
+                userInfo.Id.ToString(),
+            });
+        }
+
     }
 }

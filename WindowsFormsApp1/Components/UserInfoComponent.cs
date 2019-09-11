@@ -12,6 +12,9 @@ namespace WindowsFormsApp1.Components
 {
     public partial class UserInfoComponent : Component, ICustomComponent
     {
+        public delegate bool RemoveUser(Guid? userInfoId);
+        public event RemoveUser OnRemove;
+
         private NameComponent _firstNameComponent;
         private NameComponent _middleNameComponent;
         private NameComponent _lastNameComponent;
@@ -23,7 +26,9 @@ namespace WindowsFormsApp1.Components
 
         private List<ICustomComponent> _components;
         private Panel _panel;
-
+        private Button _removeBtn;
+        private Guid? _userId;
+        
         public UserInfoComponent(UserInfo userInfo, int width)
         {
             InitializeComponent();
@@ -47,7 +52,7 @@ namespace WindowsFormsApp1.Components
             ReLocateComponents();
         }
 
-        public UserInfo Data => new UserInfo()
+        public UserInfo Data => new UserInfo(_userId)
         {
             DobDay = _dateOfBirthComponent.Data.Day,
             DobMonth = _dateOfBirthComponent.Data.Month,
@@ -63,10 +68,10 @@ namespace WindowsFormsApp1.Components
 
         private void InitComponents(UserInfo userInfo, int width)
         {
-            var dateOfBirth = userInfo == null || 
-                !DateTime.TryParse($"{userInfo.DobDay}.{userInfo.DobMonth}.{userInfo.DobYear}", out var date)
-                    ? DateTime.Today : date;
+            var dateOfBirth = userInfo == null
+                    ? DateTime.Today : new DateTime(userInfo.DobYear, userInfo.DobMonth, userInfo.DobDay);
 
+            _userId = userInfo?.Id;
             _components = new List<ICustomComponent>()
             {
                 (_firstNameComponent = new NameComponent(userInfo?.FirstName, "First Name:")),
@@ -85,7 +90,16 @@ namespace WindowsFormsApp1.Components
                 Size = new Size(width, 0),
                 BackColor = Color.DarkKhaki
             };
+            _removeBtn = new Button()
+            {
+                Text = "Remove",
+                Size = new Size(60, GeneralConfiguration.ButtonHeight),
+                Location = new Point(0,0),
+                BackColor = Color.White
+            };
+            _panel.Controls.Add(_removeBtn);
             _panel.Controls.AddRange(_components.SelectMany(x => x.Controls).ToArray());
+            _removeBtn.Click += (sender, args) => OnRemove?.Invoke(_userId);
         }
 
         private void ReLocateComponents()
@@ -115,7 +129,9 @@ namespace WindowsFormsApp1.Components
                 }
             }
 
-            _panel.Size = new Size(Size.Width, currentHeight + _components.Last().Size.Height);
+            var controlsHeight = currentHeight + _components.Last().Size.Height + GeneralConfiguration.MarginTopForEditors;
+            _removeBtn.Location = new Point(0, controlsHeight);
+            _panel.Size = new Size(Size.Width, _removeBtn.Location.Y + _removeBtn.Size.Height);
         }
     }
 }

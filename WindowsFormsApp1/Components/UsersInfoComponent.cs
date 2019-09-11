@@ -12,9 +12,10 @@ namespace WindowsFormsApp1.Components
 {
     public partial class UsersInfoComponent : Component, ICustomComponent
     {
-        private readonly List<UserInfoComponent> _components = new List<UserInfoComponent>();
+        private List<UserInfoComponent> _components;
+        private List<UserInfo> _users;
+
         private readonly Action<List<UserInfo>> _saveUsersToFile;
-        private readonly List<UserInfo> _users;
         private readonly PageModel _pageModel = new PageModel();
 
         private readonly Timer _timer = new Timer { Interval = 500, Enabled = false };
@@ -29,7 +30,7 @@ namespace WindowsFormsApp1.Components
             _users = readUsersFromFile();
             _saveUsersToFile = saveUsersToFile;
             InitializeComponent();
-            InitComponents();
+            InitComponents(withSuscribe: true);
         }
 
         public IEnumerable<UserInfo> Data => _components.Select(x => x.Data);
@@ -51,20 +52,42 @@ namespace WindowsFormsApp1.Components
         {
             var userInfoComponent = new UserInfoComponent(userInfo, Size.Width);
             _panel.Controls.AddRange(userInfoComponent.Controls.ToArray());
+
+            userInfoComponent.OnRemove += userId =>
+            {
+                _users = _components.Select(x => x.Data).ToList();
+                var userInfoForRemove = _users?.FirstOrDefault(x => x.Id == userId);
+                if (userInfoForRemove != null)
+                {
+                    var removeResult = _users.Remove(userInfoForRemove);
+
+                    InitComponents(withSuscribe: false);
+                    Relocate();
+
+                    return removeResult;
+                }
+                return false;
+            };
+
             return userInfoComponent;
         }
 
-        private void InitComponents()
+        private void InitComponents(bool withSuscribe)
         {
-            _panel = new Panel { BackColor = Color.Aquamarine };
-            _create = CreateButton("Create", 50);
-            _left = CreateButton("<", 30);
-            _rigth = CreateButton(">", 30);
-            _save = CreateButton("Save", 50);
+            if (_panel == null) { _panel = new Panel { BackColor = Color.Aquamarine }; }
+            if (_create == null) { _create = CreateButton("Create", 50); }
+            if (_left == null) { _left = CreateButton("<", 30); }
+            if (_rigth == null) { _rigth = CreateButton(">", 30); }
+            if (_save == null) { _save = CreateButton("Save", 50); }
+
+            _components = new List<UserInfoComponent>();
             _panel.Controls.AddRange(new Control[] { _create, _left, _rigth, _save });
             _components.AddRange(_users.Select(CreateUserInfoComponent));
 
-            SubscribeToEvents();
+            if (withSuscribe)
+            {
+                SubscribeToEvents();
+            }
 
             _timer.Enabled = true;
         }
@@ -140,6 +163,12 @@ namespace WindowsFormsApp1.Components
         {
             _pageModel.CountOfComponentOnPage = GetCountOfComponentsOnPage();
             _pageModel.CountOfPages = (int)Math.Ceiling(_components.Count * 1d / _pageModel.CountOfComponentOnPage * 1d);
+
+            if (_pageModel.CountOfPages < _pageModel.CurrentPage)
+            {
+                _pageModel.CurrentPage = _pageModel.CountOfPages;
+            }
+
             _left.Visible = _pageModel.CurrentPage > 1;
             _rigth.Visible = _pageModel.CurrentPage < _pageModel.CountOfPages;
             
