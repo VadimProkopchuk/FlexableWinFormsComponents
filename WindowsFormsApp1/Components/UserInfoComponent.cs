@@ -27,7 +27,9 @@ namespace WindowsFormsApp1.Components
         private List<ICustomComponent> _components;
         private Panel _panel;
         private Button _removeBtn;
+        private Label _indexLabel;
         private Guid? _userId;
+        private int _index;
         
         public UserInfoComponent(UserInfo userInfo, int width)
         {
@@ -63,25 +65,27 @@ namespace WindowsFormsApp1.Components
             FacultyName = _facultyNameComponent.Data,
             Phone = _phoneComponent.Data,
             FirstName = _firstNameComponent.Data,
-            MiddleName = _middleNameComponent.Data
+            MiddleName = _middleNameComponent.Data,
+            Number = _index
         };
 
         private void InitComponents(UserInfo userInfo, int width)
         {
-            var dateOfBirth = userInfo == null || userInfo.DobYear < 1700
+            var dateOfBirth = userInfo.DobYear < 1700
                     ? DateTime.Today : new DateTime(userInfo.DobYear, userInfo.DobMonth, userInfo.DobDay);
 
-            _userId = userInfo?.Id;
+            _userId = userInfo.Id;
+            _index = userInfo.Number;
             _components = new List<ICustomComponent>()
             {
-                (_firstNameComponent = new NameComponent(userInfo?.FirstName, "First Name:")),
-                (_middleNameComponent = new NameComponent(userInfo?.MiddleName, "Middle Name:")),
-                (_lastNameComponent = new NameComponent(userInfo?.LastName, "Last Name:")),
-                (_facultyNameComponent = new NameComponent(userInfo?.FacultyName, "Faculty Name:")),
-                (_emailComponent = new EmailComponent(userInfo?.Email)),
-                (_groupNumberComponent = new GroupNumberComponent(userInfo?.GroupNumber)),
+                (_firstNameComponent = new NameComponent(userInfo.FirstName, "First Name:")),
+                (_middleNameComponent = new NameComponent(userInfo.MiddleName, "Middle Name:")),
+                (_lastNameComponent = new NameComponent(userInfo.LastName, "Last Name:")),
+                (_facultyNameComponent = new NameComponent(userInfo.FacultyName, "Faculty Name:")),
+                (_emailComponent = new EmailComponent(userInfo.Email)),
+                (_groupNumberComponent = new GroupNumberComponent(userInfo.GroupNumber)),
                 (_dateOfBirthComponent = new DateOfBirthComponent(dateOfBirth)),
-                (_phoneComponent = new PhoneComponent(userInfo?.Phone))
+                (_phoneComponent = new PhoneComponent(userInfo.Phone))
             };
 
             _panel = new Panel()
@@ -97,6 +101,14 @@ namespace WindowsFormsApp1.Components
                 Location = new Point(0,0),
                 BackColor = Color.White
             };
+            _indexLabel = new Label()
+            {
+                Text = $"#{_index}",
+                Size = new Size(40, 16),
+                Location = new Point(0, 0),
+                BackColor = Color.AliceBlue
+            };
+            _panel.Controls.Add(_indexLabel);
             _panel.Controls.Add(_removeBtn);
             _panel.Controls.AddRange(_components.SelectMany(x => x.Controls).ToArray());
             _removeBtn.Click += (sender, args) => OnRemove?.Invoke(_userId);
@@ -104,13 +116,13 @@ namespace WindowsFormsApp1.Components
 
         private void ReLocateComponents()
         {
-            var currentHeight = 0;
+            var currentHeight = _indexLabel.Location.Y + _indexLabel.Height + GeneralConfiguration.MarginTopForEditors;
 
             for (var i = 0; i < _components.Count; i++)
             {
                 if (i == 0)
                 {
-                    _components[i].Location = new Point(0, 0);
+                    _components[i].Location = new Point(0, currentHeight);
                 }
                 else
                 {

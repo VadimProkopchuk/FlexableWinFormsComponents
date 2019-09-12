@@ -40,6 +40,7 @@ namespace WindowsFormsApp1.Services
                 userInfo.DobDay.ToString(),
                 userInfo.DobMonth.ToString(),
                 userInfo.DobYear.ToString(),
+                userInfo.Number.ToString(),
                 userInfo.Id.ToString(),
             });
         }

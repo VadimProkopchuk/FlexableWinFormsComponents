@@ -6,6 +6,7 @@ namespace WindowsFormsApp1.Configs
 {
     class GeneralConfiguration
     {
+        public static int MaxUserNumber = 0;
         private const string FilePath = "users.txt";
         public static string UsersDataFilePath => Path.Combine(AppDomain.CurrentDomain.BaseDirectory, FilePath);
         public static char RowSeparator => '\\';

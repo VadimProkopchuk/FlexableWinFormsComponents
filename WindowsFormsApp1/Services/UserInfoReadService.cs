@@ -24,6 +24,16 @@ namespace WindowsFormsApp1.Services
                 if (usersString?.Any() == true)
                 {
                     usersInfo = usersString.Select(Parse).ToList();
+
+                    if (usersInfo.Any())
+                    {
+                        GeneralConfiguration.MaxUserNumber = usersInfo.Max(x => x.Number);
+
+                        foreach (var user in usersInfo.Where(x => x.Number == 0))
+                        {
+                            user.Number = ++GeneralConfiguration.MaxUserNumber;
+                        } 
+                    }
                 }
             }
 
@@ -34,7 +44,7 @@ namespace WindowsFormsApp1.Services
         {
             var props = str?.Split(new[] {GeneralConfiguration.PropertySeparator},
                 StringSplitOptions.RemoveEmptyEntries) ?? new string[0];
-            var id = Guid.TryParse(GetElementOrDefault(props, 10), out var userId) ? userId : Guid.NewGuid();
+            var id = Guid.TryParse(GetElementOrDefault(props, 11), out var userId) ? userId : Guid.NewGuid();
             var day = int.TryParse(GetElementOrDefault(props, 7), out var dobDay) ? dobDay : 0;
             var month = int.TryParse(GetElementOrDefault(props, 8), out var dobMonth) ? dobMonth : 0;
             var year = int.TryParse(GetElementOrDefault(props, 9), out var dobYear) ? dobYear : 0;
@@ -50,6 +60,7 @@ namespace WindowsFormsApp1.Services
                 DobDay = day,
                 DobMonth = month,
                 DobYear = year,
+                Number = int.TryParse(GetElementOrDefault(props, 10), out var number) ? number : 0
             };
 
             return user;

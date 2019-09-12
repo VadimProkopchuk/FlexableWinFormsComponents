@@ -21,5 +21,7 @@ namespace WindowsFormsApp1.Models
         public int DobDay { get; set; }
         public int DobMonth { get; set; }
         public int DobYear { get; set; }
+
+        public int Number { get; set; }
     }
 }

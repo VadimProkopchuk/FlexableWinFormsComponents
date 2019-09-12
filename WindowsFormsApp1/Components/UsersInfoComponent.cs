@@ -105,7 +105,10 @@ namespace WindowsFormsApp1.Components
 
             _create.Click += (sender, args) =>
             {
-                var userInfo = new UserInfo();
+                var userInfo = new UserInfo()
+                {
+                    Number = ++GeneralConfiguration.MaxUserNumber
+                };
 
                 _users.Add(userInfo);
                 _components.Add(CreateUserInfoComponent(userInfo));
